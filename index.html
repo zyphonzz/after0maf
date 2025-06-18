@@ -11,94 +11,387 @@
       padding: 0;
       box-sizing: border-box;
     }
+
     body {
       font-family: 'Inconsolata', monospace;
-      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url('https://t3.ftcdn.net/jpg/08/40/89/84/360_F_840898433_o7OSaS3IQb20mZfgM5jyn9ExvJB6Nr9p.jpg') center/cover no-repeat;
+      padding: 20px;
+      overflow-x: auto;
     }
+
     .window-title {
       font-family: 'Inter', sans-serif !important;
     }
+
     .fade-in {
       animation: fadeIn 1s ease-out forwards;
     }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
     .edit-btn {
-      position: absolute;
+      position: fixed;
       top: 20px;
       left: 20px;
-      padding: 6px 12px;
-      border-radius: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid #999;
       color: white;
       font-family: 'Inconsolata', monospace;
       cursor: pointer;
       z-index: 999;
+      backdrop-filter: blur(10px);
+      transition: background 0.3s ease;
     }
+
     .edit-btn:hover {
       background: rgba(255, 255, 255, 0.2);
     }
+
     [contenteditable="true"]:focus {
       outline: 2px dashed #30D158;
       background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
     }
-    a.link {
+
+    .main-container {
+      width: min(90vw, 1200px);
+      max-width: 1200px;
+      aspect-ratio: 16/10;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .terminal-window {
+      width: 100%;
+      max-width: 900px;
+      aspect-ratio: 886/893;
+      position: relative;
+      border-radius: 16px;
+      border: 1px solid #686868;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .terminal-header {
+      width: 100%;
+      height: 36px;
+      background: rgba(50, 50, 50, 0.88);
+      backdrop-filter: blur(22.5px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .control-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset;
+    }
+
+    .control-btn.close { background: #FF453A; }
+    .control-btn.minimize { background: #FFD60A; }
+    .control-btn.maximize { background: #30D158; }
+
+    .window-title-text {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: clamp(12px, 1.5vw, 15px);
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+    }
+
+    .terminal-body {
+      width: 100%;
+      height: calc(100% - 36px);
+      background: #1E1E1E;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .profile-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .ascii-art {
+      background: rgba(217, 217, 217, 0.04);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      color: rgba(255, 255, 255, 0.81);
+      font-size: clamp(3px, 0.4vw, 4px);
+      line-height: 1.2;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .info-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .info-card {
+      background: rgba(217, 217, 217, 0.04);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      color: white;
+      font-family: 'Inconsolata', monospace;
+    }
+
+    .info-card h3 {
+      font-size: clamp(16px, 2vw, 20px);
+      margin-bottom: 8px;
+      color: #30D158;
+    }
+
+    .info-card p {
+      font-size: clamp(14px, 1.8vw, 18px);
+      line-height: 1.4;
+    }
+
+    .links-card {
+      background: rgba(217, 217, 217, 0.04);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+    }
+
+    .links-card a {
       color: #B0B0B0;
       text-decoration: underline;
-      font-size: 12px;
-      font-family: Inter, sans-serif;
-      position: absolute;
+      font-size: clamp(10px, 1.2vw, 12px);
+      font-family: 'Inter', sans-serif;
+      display: block;
+      margin-bottom: 8px;
+      transition: color 0.3s ease;
+    }
+
+    .links-card a:hover {
+      color: #30D158;
+    }
+
+    .crow-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: clamp(150px, 20vw, 250px);
+      height: auto;
+      z-index: 100;
+    }
+
+    .crow-img {
+      width: 100%;
+      height: auto;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .crow-img:hover {
+      transform: scale(1.05);
+    }
+
+    .developer-credit {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: clamp(10px, 1vw, 12px);
+      font-family: 'Inconsolata', monospace;
+      z-index: 100;
+    }
+
+    .content-area {
+      grid-column: 1 / -1;
+      background: rgba(217, 217, 217, 0.04);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 200px;
+      color: white;
+      font-family: 'Inconsolata', monospace;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .terminal-body {
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 15px;
+      }
+      
+      .main-container {
+        width: 95vw;
+      }
+      
+      .crow-container {
+        width: 120px;
+        bottom: 10px;
+        right: 10px;
+      }
+      
+      .developer-credit {
+        bottom: 10px;
+        left: 10px;
+      }
+      
+      .edit-btn {
+        top: 10px;
+        left: 10px;
+        padding: 6px 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .ascii-art {
+        font-size: 2px;
+        padding: 10px;
+      }
+      
+      .terminal-body {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
   <button class="edit-btn" onclick="requestEdit()">Enter Edit Code</button>
+  
   <audio id="crowSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_a87868e318.mp3"></audio>
+  
   <div id="mainContent" class="fade-in">
-    <div style="width: 1920px; height: 1080px; position: relative">
-      <img style="width: 1920px; height: 1080px; left: 0px; top: 0px; position: absolute" src="https://t3.ftcdn.net/jpg/08/40/89/84/360_F_840898433_o7OSaS3IQb20mZfgM5jyn9ExvJB6Nr9p.jpg" />
-      <div style="width: 886px; height: 893px; left: 517px; top: 93px; position: absolute; border-radius: 16px; outline: 1px black solid"></div>
-      <div style="width: 886px; height: 857px; left: 517px; top: 126px; position: absolute; background: #1E1E1E; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px"></div>
-      <div style="width: 886px; height: 36px; left: 517px; top: 93px; position: absolute; background: rgba(50, 50, 50, 0.88); border-top-left-radius: 16px; border-top-right-radius: 16px; backdrop-filter: blur(22.50px)"></div>
-      <div style="width: 886px; height: 893px; left: 517px; top: 93px; position: absolute; border-radius: 16px; border: 1px #686868 solid"></div>
-      <div style="width: 46px; height: 10px; left: 532px; top: 106px; position: absolute; justify-content: flex-start; align-items: flex-start; gap: 8px; display: inline-flex">
-        <div style="width: 10px; height: 10px; background: #FF453A; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
-        <div style="width: 10px; height: 10px; background: #FFD60A; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
-        <div style="width: 10px; height: 10px; background: #30D158; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
+    <div class="main-container">
+      <div class="terminal-window">
+        <div class="terminal-header">
+          <div class="window-controls">
+            <div class="control-btn close"></div>
+            <div class="control-btn minimize"></div>
+            <div class="control-btn maximize"></div>
+          </div>
+          <div class="window-title-text">~ : bash — After0Maf</div>
+          <div></div>
+        </div>
+        
+        <div class="terminal-body">
+          <div class="profile-section">
+            <div class="ascii-art">
+               ████████               <br/>
+           ████▓▓▓▓▓▓▓▓████           <br/>
+        ███▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███        <br/>
+       █▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>
+      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>
+      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>
+     █▓▓▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█     <br/>
+     █▓▓▓▒▒███▒▒▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>
+     █▓▓▓▓▓███▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>
+      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>
+      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>
+       █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>
+        ███▓▓▓▓▓██████▓▓▓▓▓███        <br/>
+           ████▓▓▓▓▓▓▓▓████           <br/>
+               ████████               <br/>
+                                      <br/>
+            ██████████████            <br/>
+        █████   ▄════▄   █████        <br/>
+     ███▓▓▓▓█   ▌████▐   █▓▓▓▓███     <br/>
+   ██▓▓▓▓▓▓▓█   ▌████▐   █▓▓▓▓▓▓▓██   <br/>
+  █▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓█  <br/>
+ █▓▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓▓█ <br/>
+ █▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐██▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓█ <br/>
+█▓▓▓▓▓▓▓▓▓▓▓▓▓█  ▌▐▌▐  █▓▓▓▓▓▓▓▓▓▓▓▓▓█<br/>
+█▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓▓▓█
+            </div>
+          </div>
+          
+          <div class="info-section">
+            <div class="info-card">
+              <h3>Profile</h3>
+              <p>Name: After0Maf | Pronouns: He/Him | Age: 13</p>
+            </div>
+            
+            <div class="info-card">
+              <h3>Description</h3>
+              <p>"the 0 in my name is silent<br/>its just there to look cool"</p>
+            </div>
+            
+            <div class="links-card">
+              <a href="https://www.roblox.com/users/5677297724/profile" target="_blank">https://www.roblox.com/users/5677297724/profile</a>
+              <a href="https://www.youtube.com/@After0Maf" target="_blank">https://www.youtube.com/@After0Maf</a>
+            </div>
+          </div>
+          
+          <div class="content-area">
+            <p>// Additional content area</p>
+            <p>// This space can be used for more information, projects, or updates</p>
+          </div>
+        </div>
       </div>
-      <div style="width: 256px; height: 28px; left: 832px; top: 97px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.85); font-size: 15px; font-family: SF Pro; font-weight: 274; line-height: 22px; word-wrap: break-word">~ : bash — After0Maf</div>
-      <div style="width: 208px; height: 219px; left: 532px; top: 146px; position: absolute; backgaround: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
-      <div style="width: 640px; height: 56px; left: 747px; top: 146px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
-      <div style="width: 627px; height: 25px; left: 760px; top: 161px; position: absolute; justify-content: center; display: flex; flex-direction: column; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 7px; word-wrap: break-word">Name: After0Maf | Pronouns: He/Him | Age: 13</div>
-      <div style="width: 640px; height: 91px; left: 747px; top: 209px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
-      <div style="width: 627px; height: 58px; left: 760px; top: 223px; position: absolute; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word">Description:<br/>“the 0 in my name is silent<br/>its just there to look cool”</div>
-      <div style="width: 627px; height: 58px; left: 1217px; top: 791px; position: absolute; color: white; font-size: 12px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word">developed by zyphonz</div>
-      <div style="width: 147px; height: 184px; left: 563px; top: 163px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.81); font-size: 4px; font-family: Kelly Slab; font-weight: 400; line-height: 7px; word-wrap: break-word">               ████████               <br/>           ████▓▓▓▓▓▓▓▓████           <br/>        ███▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███        <br/>       █▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>     █▓▓▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█     <br/>     █▓▓▓▒▒███▒▒▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>     █▓▓▓▓▓███▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>       █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>        ███▓▓▓▓▓██████▓▓▓▓▓███        <br/>           ████▓▓▓▓▓▓▓▓████           <br/>               ████████               <br/>                                      <br/>            ██████████████            <br/>        █████   ▄════▄   █████        <br/>     ███▓▓▓▓█   ▌████▐   █▓▓▓▓███     <br/>   ██▓▓▓▓▓▓▓█   ▌████▐   █▓▓▓▓▓▓▓██   <br/>  █▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓█  <br/> █▓▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓▓█ <br/> █▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐██▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓█ <br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓█  ▌▐▌▐  █▓▓▓▓▓▓▓▓▓▓▓▓▓█<br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓▓▓█</div>
-      <img style="width: 291px; height: 227px; left: 1112px; top: 759px; position: absolute" src="https://placehold.co/291x227" />
-      <div style="width: 640px; height: 58px; left: 747px; top: 307px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
-      <a href="https://www.roblox.com/users/5677297724/profile" class="link" style="left: 760px; top: 316px;">https://www.roblox.com/users/5677297724/profile</a>
-      <a href="https://www.youtube.com/@After0Maf" class="link" style="left: 760px; top: 337px;">https://www.youtube.com/@After0Maf</a>
-      <img id="crowImg" onclick="document.getElementById('crowSound').play()" style="width: 291px; height: 227px; left: 1112px; top: 759px; position: absolute; cursor: pointer;" src="https://cdn.discordapp.com/attachments/1340194765299519498/1384990664697184357/image.png?ex=68547092&is=68531f12&hm=1917198f8f1ba7356902cd6e4a827c0d142915ebedde822221fa363ba7b3872e&" />
-      <div style="width: 855px; height: 387px; left: 532px; top: 372px; position: absolute; overflow: hidden">
-        <div style="width: 855px; height: 387px; left: 0px; top: 0px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
-      </div>
+    </div>
   </div>
+
+  <div class="crow-container">
+    <img id="crowImg" 
+         class="crow-img"
+         onclick="document.getElementById('crowSound').play()" 
+         src="https://cdn.discordapp.com/attachments/1340194765299519498/1384990664697184357/image.png?ex=68547092&is=68531f12&hm=1917198f8f1ba7356902cd6e4a827c0d142915ebedde822221fa363ba7b3872e&" 
+         alt="Clickable crow" />
+  </div>
+
+  <div class="developer-credit">
+    developed by zyphonz
+  </div>
+
   <script>
     const correctCode = "letmein";
+    
     function requestEdit() {
       const code = prompt("Enter code to enable editing:");
       if (code === correctCode) {
         alert("Editing enabled. You can now click and edit content.");
-        document.querySelectorAll('#mainContent div, #mainContent span').forEach(el => {
+        document.querySelectorAll('#mainContent .info-card p, #mainContent .content-area').forEach(el => {
           el.setAttribute("contenteditable", "true");
         });
       } else {
         alert("Incorrect code.");
       }
     }
+
+    // Add some interactive effects
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add hover effects to control buttons
+      document.querySelectorAll('.control-btn').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+          this.style.transform = 'scale(1.1)';
+        });
+        btn.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1)';
+        });
+      });
+    });
   </script>
 </body>
 </html>
