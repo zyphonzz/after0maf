@@ -19,8 +19,7 @@
       align-items: center;
       justify-content: center;
       background: url('https://t3.ftcdn.net/jpg/08/40/89/84/360_F_840898433_o7OSaS3IQb20mZfgM5jyn9ExvJB6Nr9p.jpg') center/cover no-repeat;
-      padding: 20px;
-      overflow-x: auto;
+      overflow: hidden;
     }
 
     .window-title {
@@ -49,11 +48,73 @@
       cursor: pointer;
       z-index: 999;
       backdrop-filter: blur(10px);
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .edit-btn:hover {
       background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .save-btn {
+      position: fixed;
+      top: 20px;
+      left: 180px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: rgba(48, 209, 88, 0.8);
+      border: 1px solid #30D158;
+      color: white;
+      font-family: 'Inconsolata', monospace;
+      cursor: pointer;
+      z-index: 999;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      display: none;
+    }
+
+    .save-btn:hover {
+      background: rgba(48, 209, 88, 1);
+      transform: scale(1.05);
+    }
+
+    .edit-dock {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 30, 30, 0.9);
+      border: 1px solid #555;
+      border-radius: 12px;
+      padding: 10px;
+      display: none;
+      gap: 10px;
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+    }
+
+    .tool-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+
+    .tool-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .tool-btn.active {
+      background: rgba(48, 209, 88, 0.8);
     }
 
     [contenteditable="true"]:focus {
@@ -62,335 +123,520 @@
       border-radius: 4px;
     }
 
-    .main-container {
-      width: min(90vw, 1200px);
-      max-width: 1200px;
-      aspect-ratio: 16/10;
-      position: relative;
-      display: flex;
+    .editable-element {
+      transition: all 0.3s ease;
+    }
+
+    .editable-element:hover {
+      box-shadow: 0 0 10px rgba(48, 209, 88, 0.5);
+    }
+
+    .editable-element.selected {
+      outline: 2px solid #30D158;
+      outline-offset: 2px;
+    }
+
+    .resize-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #30D158;
+      border: 1px solid white;
+      border-radius: 50%;
+      display: none;
+      cursor: nw-resize;
+    }
+
+    .resize-handle.bottom-right {
+      bottom: -5px;
+      right: -5px;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 20px;
+      height: 20px;
+      background: #FF453A;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: none;
       align-items: center;
       justify-content: center;
+      font-size: 12px;
+      z-index: 1001;
     }
 
-    .terminal-window {
-      width: 100%;
-      max-width: 900px;
-      aspect-ratio: 886/893;
+    .main-container {
+      width: 1920px;
+      height: 1080px;
       position: relative;
-      border-radius: 16px;
-      border: 1px solid #686868;
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transform: scale(min(100vw/1920px, 100vh/1080px));
+      transform-origin: center;
     }
 
-    .terminal-header {
-      width: 100%;
-      height: 36px;
-      background: rgba(50, 50, 50, 0.88);
-      backdrop-filter: blur(22.5px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-    }
-
-    .window-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    .control-btn {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset;
-    }
-
-    .control-btn.close { background: #FF453A; }
-    .control-btn.minimize { background: #FFD60A; }
-    .control-btn.maximize { background: #30D158; }
-
-    .window-title-text {
-      color: rgba(255, 255, 255, 0.85);
-      font-size: clamp(12px, 1.5vw, 15px);
-      font-family: 'Inter', sans-serif;
-      font-weight: 400;
-    }
-
-    .terminal-body {
-      width: 100%;
-      height: calc(100% - 36px);
-      background: #1E1E1E;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
-      overflow-y: auto;
-    }
-
-    .profile-section {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .ascii-art {
-      background: rgba(217, 217, 217, 0.04);
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 15px;
-      font-family: 'Courier New', monospace;
-      color: rgba(255, 255, 255, 0.81);
-      font-size: clamp(3px, 0.4vw, 4px);
-      line-height: 1.2;
-      text-align: center;
-      overflow: hidden;
-    }
-
-    .info-section {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .info-card {
-      background: rgba(217, 217, 217, 0.04);
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 15px;
-      color: white;
-      font-family: 'Inconsolata', monospace;
-    }
-
-    .info-card h3 {
-      font-size: clamp(16px, 2vw, 20px);
-      margin-bottom: 8px;
-      color: #30D158;
-    }
-
-    .info-card p {
-      font-size: clamp(14px, 1.8vw, 18px);
-      line-height: 1.4;
-    }
-
-    .links-card {
-      background: rgba(217, 217, 217, 0.04);
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 15px;
-    }
-
-    .links-card a {
+    a.link {
       color: #B0B0B0;
       text-decoration: underline;
-      font-size: clamp(10px, 1.2vw, 12px);
-      font-family: 'Inter', sans-serif;
-      display: block;
-      margin-bottom: 8px;
+      font-size: 12px;
+      font-family: Inter, sans-serif;
+      position: absolute;
       transition: color 0.3s ease;
     }
 
-    .links-card a:hover {
+    a.link:hover {
       color: #30D158;
     }
 
-    .crow-container {
+    .draggable {
+      cursor: move;
+    }
+
+    .dragging {
+      opacity: 0.8;
+      z-index: 1000;
+    }
+
+    /* Notification system */
+    .notification {
       position: fixed;
-      bottom: 20px;
+      top: 80px;
       right: 20px;
-      width: clamp(150px, 20vw, 250px);
-      height: auto;
-      z-index: 100;
-    }
-
-    .crow-img {
-      width: 100%;
-      height: auto;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: transform 0.3s ease;
-    }
-
-    .crow-img:hover {
-      transform: scale(1.05);
-    }
-
-    .developer-credit {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: clamp(10px, 1vw, 12px);
-      font-family: 'Inconsolata', monospace;
-      z-index: 100;
-    }
-
-    .content-area {
-      grid-column: 1 / -1;
-      background: rgba(217, 217, 217, 0.04);
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 20px;
-      min-height: 200px;
+      background: rgba(30, 30, 30, 0.9);
       color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border-left: 4px solid #30D158;
+      z-index: 1002;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
       font-family: 'Inconsolata', monospace;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .terminal-body {
-        grid-template-columns: 1fr;
-        padding: 15px;
-        gap: 15px;
-      }
-      
-      .main-container {
-        width: 95vw;
-      }
-      
-      .crow-container {
-        width: 120px;
-        bottom: 10px;
-        right: 10px;
-      }
-      
-      .developer-credit {
-        bottom: 10px;
-        left: 10px;
-      }
-      
-      .edit-btn {
-        top: 10px;
-        left: 10px;
-        padding: 6px 12px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .ascii-art {
-        font-size: 2px;
-        padding: 10px;
-      }
-      
-      .terminal-body {
-        padding: 10px;
-      }
+    .notification.show {
+      transform: translateX(0);
     }
   </style>
 </head>
 <body>
-  <button class="edit-btn" onclick="requestEdit()">Enter Edit Code</button>
+  <button class="edit-btn" onclick="toggleEdit()">Enter Edit Mode</button>
+  <button class="save-btn" onclick="saveLayout()">💾 Save</button>
+  
+  <div class="edit-dock">
+    <button class="tool-btn" data-tool="select" title="Select">🔍</button>
+    <button class="tool-btn" data-tool="move" title="Move">✋</button>
+    <button class="tool-btn" data-tool="resize" title="Resize">📏</button>
+    <button class="tool-btn" data-tool="edit" title="Edit Text">✏️</button>
+    <button class="tool-btn" data-tool="delete" title="Delete">🗑️</button>
+  </div>
+
+  <div class="notification" id="notification"></div>
   
   <audio id="crowSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_a87868e318.mp3"></audio>
   
   <div id="mainContent" class="fade-in">
     <div class="main-container">
-      <div class="terminal-window">
-        <div class="terminal-header">
-          <div class="window-controls">
-            <div class="control-btn close"></div>
-            <div class="control-btn minimize"></div>
-            <div class="control-btn maximize"></div>
-          </div>
-          <div class="window-title-text">~ : bash — After0Maf</div>
-          <div></div>
-        </div>
-        
-        <div class="terminal-body">
-          <div class="profile-section">
-            <div class="ascii-art">
-               ████████               <br/>
-           ████▓▓▓▓▓▓▓▓████           <br/>
-        ███▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███        <br/>
-       █▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>
-      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>
-      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>
-     █▓▓▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█     <br/>
-     █▓▓▓▒▒███▒▒▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>
-     █▓▓▓▓▓███▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>
-      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>
-      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>
-       █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>
-        ███▓▓▓▓▓██████▓▓▓▓▓███        <br/>
-           ████▓▓▓▓▓▓▓▓████           <br/>
-               ████████               <br/>
-                                      <br/>
-            ██████████████            <br/>
-        █████   ▄════▄   █████        <br/>
-     ███▓▓▓▓█   ▌████▐   █▓▓▓▓███     <br/>
-   ██▓▓▓▓▓▓▓█   ▌████▐   █▓▓▓▓▓▓▓██   <br/>
-  █▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓█  <br/>
- █▓▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓▓█ <br/>
- █▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐██▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓█ <br/>
-█▓▓▓▓▓▓▓▓▓▓▓▓▓█  ▌▐▌▐  █▓▓▓▓▓▓▓▓▓▓▓▓▓█<br/>
-█▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓▓▓█
-            </div>
-          </div>
-          
-          <div class="info-section">
-            <div class="info-card">
-              <h3>Profile</h3>
-              <p>Name: After0Maf | Pronouns: He/Him | Age: 13</p>
-            </div>
-            
-            <div class="info-card">
-              <h3>Description</h3>
-              <p>"the 0 in my name is silent<br/>its just there to look cool"</p>
-            </div>
-            
-            <div class="links-card">
-              <a href="https://www.roblox.com/users/5677297724/profile" target="_blank">https://www.roblox.com/users/5677297724/profile</a>
-              <a href="https://www.youtube.com/@After0Maf" target="_blank">https://www.youtube.com/@After0Maf</a>
-            </div>
-          </div>
-          
-          <div class="content-area">
-            <p>// Additional content area</p>
-            <p>// This space can be used for more information, projects, or updates</p>
-          </div>
-        </div>
+      <img style="width: 1920px; height: 1080px; left: 0px; top: 0px; position: absolute" src="https://t3.ftcdn.net/jpg/08/40/89/84/360_F_840898433_o7OSaS3IQb20mZfgM5jyn9ExvJB6Nr9p.jpg" />
+      
+      <div class="editable-element" data-id="terminal-outline" style="width: 886px; height: 893px; left: 517px; top: 93px; position: absolute; border-radius: 16px; outline: 1px black solid">
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="terminal-body" style="width: 886px; height: 857px; left: 517px; top: 126px; position: absolute; background: #1E1E1E; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px">
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="terminal-header" style="width: 886px; height: 36px; left: 517px; top: 93px; position: absolute; background: rgba(50, 50, 50, 0.88); border-top-left-radius: 16px; border-top-right-radius: 16px; backdrop-filter: blur(22.50px)">
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="terminal-border" style="width: 886px; height: 893px; left: 517px; top: 93px; position: absolute; border-radius: 16px; border: 1px #686868 solid">
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="window-controls" style="width: 46px; height: 10px; left: 532px; top: 106px; position: absolute; justify-content: flex-start; align-items: flex-start; gap: 8px; display: inline-flex">
+        <div style="width: 10px; height: 10px; background: #FF453A; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
+        <div style="width: 10px; height: 10px; background: #FFD60A; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
+        <div style="width: 10px; height: 10px; background: #30D158; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="window-title" style="width: 256px; height: 28px; left: 832px; top: 97px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.85); font-size: 15px; font-family: SF Pro; font-weight: 274; line-height: 22px; word-wrap: break-word" contenteditable="true">~ : bash — After0Maf
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="ascii-container" style="width: 208px; height: 219px; left: 532px; top: 146px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid">
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="name-container" style="width: 640px; height: 56px; left: 747px; top: 146px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid">
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="name-text" style="width: 627px; height: 25px; left: 760px; top: 161px; position: absolute; justify-content: center; display: flex; flex-direction: column; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 7px; word-wrap: break-word" contenteditable="true">Name: After0Maf | Pronouns: He/Him | Age: 13
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="desc-container" style="width: 640px; height: 91px; left: 747px; top: 209px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid">
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="desc-text" style="width: 627px; height: 58px; left: 760px; top: 223px; position: absolute; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word" contenteditable="true">Description:<br/>"the 0 in my name is silent<br/>its just there to look cool"
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="dev-credit" style="width: 627px; height: 58px; left: 1217px; top: 791px; position: absolute; color: white; font-size: 12px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word" contenteditable="true">developed by zyphonz
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="ascii-art" style="width: 147px; height: 184px; left: 563px; top: 163px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.81); font-size: 4px; font-family: Kelly Slab; font-weight: 400; line-height: 7px; word-wrap: break-word" contenteditable="true">               ████████               <br/>           ████▓▓▓▓▓▓▓▓████           <br/>        ███▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███        <br/>       █▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>     █▓▓▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█     <br/>     █▓▓▓▒▒███▒▒▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>     █▓▓▓▓▓███▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>       █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>        ███▓▓▓▓▓██████▓▓▓▓▓███        <br/>           ████▓▓▓▓▓▓▓▓████           <br/>               ████████               <br/>                                      <br/>            ██████████████            <br/>        █████   ▄════▄   █████        <br/>     ███▓▓▓▓█   ▌████▐   █▓▓▓▓███     <br/>   ██▓▓▓▓▓▓▓█   ▌████▐   █▓▓▓▓▓▓▓██   <br/>  █▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓█  <br/> █▓▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓▓█ <br/> █▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐██▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓█ <br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓█  ▌▐▌▐  █▓▓▓▓▓▓▓▓▓▓▓▓▓█<br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓▓▓█
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <div class="editable-element" data-id="links-container" style="width: 640px; height: 58px; left: 747px; top: 307px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid">
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </div>
+      
+      <a href="https://www.roblox.com/users/5677297724/profile" class="link editable-element" data-id="roblox-link" style="left: 760px; top: 316px;" contenteditable="true">https://www.roblox.com/users/5677297724/profile
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </a>
+      
+      <a href="https://www.youtube.com/@After0Maf" class="link editable-element" data-id="youtube-link" style="left: 760px; top: 337px;" contenteditable="true">https://www.youtube.com/@After0Maf
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </a>
+      
+      <img id="crowImg" 
+           class="editable-element" 
+           data-id="crow-image"
+           onclick="document.getElementById('crowSound').play()" 
+           style="width: 291px; height: 227px; left: 1112px; top: 759px; position: absolute; cursor: pointer; transition: transform 0.3s ease;" 
+           src="https://cdn.discordapp.com/attachments/1340194765299519498/1384990664697184357/image.png?ex=68547092&is=68531f12&hm=1917198f8f1ba7356902cd6e4a827c0d142915ebedde822221fa363ba7b3872e&" 
+           onmouseover="this.style.transform='scale(1.05)'" 
+           onmouseout="this.style.transform='scale(1)'" >
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
+      </img>
+      
+      <div class="editable-element" data-id="content-area" style="width: 855px; height: 387px; left: 532px; top: 372px; position: absolute; overflow: hidden">
+        <div style="width: 855px; height: 387px; left: 0px; top: 0px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
+        <div class="resize-handle bottom-right"></div>
+        <button class="delete-btn">×</button>
       </div>
     </div>
   </div>
 
-  <div class="crow-container">
-    <img id="crowImg" 
-         class="crow-img"
-         onclick="document.getElementById('crowSound').play()" 
-         src="https://cdn.discordapp.com/attachments/1340194765299519498/1384990664697184357/image.png?ex=68547092&is=68531f12&hm=1917198f8f1ba7356902cd6e4a827c0d142915ebedde822221fa363ba7b3872e&" 
-         alt="Clickable crow" />
-  </div>
-
-  <div class="developer-credit">
-    developed by zyphonz
-  </div>
-
   <script>
-    const correctCode = "letmein";
-    
-    function requestEdit() {
-      const code = prompt("Enter code to enable editing:");
-      if (code === correctCode) {
-        alert("Editing enabled. You can now click and edit content.");
-        document.querySelectorAll('#mainContent .info-card p, #mainContent .content-area').forEach(el => {
-          el.setAttribute("contenteditable", "true");
-        });
+    let isEditMode = false;
+    let currentTool = 'select';
+    let selectedElement = null;
+    let isDragging = false;
+    let isResizing = false;
+    let dragOffset = { x: 0, y: 0 };
+
+    // Load saved layout on page load
+    window.addEventListener('load', loadLayout);
+
+    function toggleEdit() {
+      isEditMode = !isEditMode;
+      const editBtn = document.querySelector('.edit-btn');
+      const saveBtn = document.querySelector('.save-btn');
+      const dock = document.querySelector('.edit-dock');
+      
+      if (isEditMode) {
+        editBtn.textContent = 'Exit Edit Mode';
+        editBtn.style.background = 'rgba(255, 69, 58, 0.8)';
+        saveBtn.style.display = 'block';
+        dock.style.display = 'flex';
+        enableEditMode();
+        showNotification('Edit mode enabled! Use the dock to select tools.');
       } else {
-        alert("Incorrect code.");
+        editBtn.textContent = 'Enter Edit Mode';
+        editBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+        saveBtn.style.display = 'none';
+        dock.style.display = 'none';
+        disableEditMode();
+        showNotification('Edit mode disabled.');
       }
     }
 
-    // Add some interactive effects
-    document.addEventListener('DOMContentLoaded', function() {
-      // Add hover effects to control buttons
-      document.querySelectorAll('.control-btn').forEach(btn => {
-        btn.addEventListener('mouseenter', function() {
-          this.style.transform = 'scale(1.1)';
-        });
-        btn.addEventListener('mouseleave', function() {
-          this.style.transform = 'scale(1)';
-        });
+    function enableEditMode() {
+      document.querySelectorAll('.editable-element').forEach(el => {
+        el.classList.add('editable-element');
+        el.addEventListener('mousedown', handleMouseDown);
+        el.addEventListener('click', handleElementClick);
       });
+      
+      // Tool selection
+      document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.addEventListener('click', selectTool);
+      });
+      
+      // Set default tool
+      selectTool({ target: document.querySelector('[data-tool="select"]') });
+    }
+
+    function disableEditMode() {
+      document.querySelectorAll('.editable-element').forEach(el => {
+        el.classList.remove('selected');
+        el.removeEventListener('mousedown', handleMouseDown);
+        el.removeEventListener('click', handleElementClick);
+        el.querySelector('.resize-handle').style.display = 'none';
+        el.querySelector('.delete-btn').style.display = 'none';
+      });
+      
+      if (selectedElement) {
+        selectedElement.classList.remove('selected');
+        selectedElement = null;
+      }
+    }
+
+    function selectTool(e) {
+      currentTool = e.target.dataset.tool;
+      document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+      e.target.classList.add('active');
+      
+      // Update cursor based on tool
+      const cursor = {
+        'select': 'default',
+        'move': 'move',
+        'resize': 'nw-resize',
+        'edit': 'text',
+        'delete': 'crosshair'
+      };
+      
+      document.querySelectorAll('.editable-element').forEach(el => {
+        el.style.cursor = cursor[currentTool];
+      });
+    }
+
+    function handleElementClick(e) {
+      if (!isEditMode) return;
+      e.stopPropagation();
+      
+      if (currentTool === 'delete') {
+        if (confirm('Are you sure you want to delete this element?')) {
+          e.target.remove();
+          showNotification('Element deleted.');
+        }
+        return;
+      }
+      
+      // Select element
+      if (selectedElement) {
+        selectedElement.classList.remove('selected');
+        selectedElement.querySelector('.resize-handle').style.display = 'none';
+        selectedElement.querySelector('.delete-btn').style.display = 'none';
+      }
+      
+      selectedElement = e.target;
+      selectedElement.classList.add('selected');
+      
+      if (currentTool === 'resize') {
+        selectedElement.querySelector('.resize-handle').style.display = 'block';
+      }
+      
+      if (currentTool === 'select') {
+        selectedElement.querySelector('.delete-btn').style.display = 'flex';
+      }
+      
+      if (currentTool === 'edit') {
+        selectedElement.setAttribute('contenteditable', 'true');
+        selectedElement.focus();
+      }
+    }
+
+    function handleMouseDown(e) {
+      if (!isEditMode || currentTool !== 'move') return;
+      
+      isDragging = true;
+      const rect = e.target.getBoundingClientRect();
+      const containerRect = document.querySelector('.main-container').getBoundingClientRect();
+      const scale = containerRect.width / 1920;
+      
+      dragOffset.x = (e.clientX - rect.left) / scale;
+      dragOffset.y = (e.clientY - rect.top) / scale;
+      
+      e.target.classList.add('dragging');
+      
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      e.preventDefault();
+    }
+
+    function handleMouseMove(e) {
+      if (!isDragging || !selectedElement) return;
+      
+      const containerRect = document.querySelector('.main-container').getBoundingClientRect();
+      const scale = containerRect.width / 1920;
+      
+      const x = (e.clientX - containerRect.left) / scale - dragOffset.x;
+      const y = (e.clientY - containerRect.top) / scale - dragOffset.y;
+      
+      selectedElement.style.left = Math.max(0, Math.min(1920 - selectedElement.offsetWidth, x)) + 'px';
+      selectedElement.style.top = Math.max(0, Math.min(1080 - selectedElement.offsetHeight, y)) + 'px';
+    }
+
+    function handleMouseUp() {
+      if (isDragging) {
+        isDragging = false;
+        if (selectedElement) {
+          selectedElement.classList.remove('dragging');
+        }
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      }
+    }
+
+    // Resize functionality
+    document.addEventListener('mousedown', function(e) {
+      if (e.target.classList.contains('resize-handle')) {
+        isResizing = true;
+        selectedElement = e.target.parentElement;
+        
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('mouseup', stopResize);
+        e.preventDefault();
+      }
+    });
+
+    function handleResize(e) {
+      if (!isResizing || !selectedElement) return;
+      
+      const containerRect = document.querySelector('.main-container').getBoundingClientRect();
+      const scale = containerRect.width / 1920;
+      
+      const x = (e.clientX - containerRect.left) / scale;
+      const y = (e.clientY - containerRect.top) / scale;
+      
+      const elementRect = selectedElement.getBoundingClientRect();
+      const elementLeft = parseInt(selectedElement.style.left);
+      const elementTop = parseInt(selectedElement.style.top);
+      
+      const newWidth = Math.max(50, x - elementLeft);
+      const newHeight = Math.max(30, y - elementTop);
+      
+      selectedElement.style.width = newWidth + 'px';
+      selectedElement.style.height = newHeight + 'px';
+    }
+
+    function stopResize() {
+      isResizing = false;
+      document.removeEventListener('mousemove', handleResize);
+      document.removeEventListener('mouseup', stopResize);
+    }
+
+    // Delete button functionality
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('delete-btn')) {
+        if (confirm('Are you sure you want to delete this element?')) {
+          e.target.parentElement.remove();
+          showNotification('Element deleted.');
+        }
+      }
+    });
+
+    function saveLayout() {
+      const elements = {};
+      document.querySelectorAll('.editable-element').forEach(el => {
+        const id = el.dataset.id;
+        if (id) {
+          elements[id] = {
+            style: el.style.cssText,
+            content: el.innerHTML,
+            tagName: el.tagName
+          };
+        }
+      });
+      
+      localStorage.setItem('after0maf_layout', JSON.stringify(elements));
+      showNotification('Layout saved successfully!');
+    }
+
+    function loadLayout() {
+      const saved = localStorage.getItem('after0maf_layout');
+      if (saved) {
+        const elements = JSON.parse(saved);
+        Object.keys(elements).forEach(id => {
+          const el = document.querySelector(`[data-id="${id}"]`);
+          if (el) {
+            el.style.cssText = elements[id].style;
+            // Only restore content for text elements, not structural ones
+            if (el.hasAttribute('contenteditable')) {
+              el.innerHTML = elements[id].content;
+            }
+          }
+        });
+        showNotification('Layout loaded from saved data.');
+      }
+    }
+
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    // Click outside to deselect
+    document.addEventListener('click', function(e) {
+      if (isEditMode && !e.target.classList.contains('editable-element') && !e.target.closest('.editable-element')) {
+        if (selectedElement) {
+          selectedElement.classList.remove('selected');
+          selectedElement.querySelector('.resize-handle').style.display = 'none';
+          selectedElement.querySelector('.delete-btn').style.display = 'none';
+          selectedElement = null;
+        }
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (!isEditMode) return;
+      
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        saveLayout();
+      }
+      
+      if (e.key === 'Delete' && selectedElement) {
+        if (confirm('Are you sure you want to delete this element?')) {
+          selectedElement.remove();
+          selectedElement = null;
+          showNotification('Element deleted.');
+        }
+      }
+      
+      if (e.key === 'Escape') {
+        if (selectedElement) {
+          selectedElement.classList.remove('selected');
+          selectedElement.querySelector('.resize-handle').style.display = 'none';
+          selectedElement.querySelector('.delete-btn').style.display = 'none';
+          selectedElement = null;
+        }
+      }
     });
   </script>
 </body>
