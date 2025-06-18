@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>After0Maf</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inconsolata', monospace;
+      overflow: hidden;
+    }
+    .window-title {
+      font-family: 'Inter', sans-serif !important;
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .edit-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #999;
+      color: white;
+      font-family: 'Inconsolata', monospace;
+      cursor: pointer;
+      z-index: 999;
+    }
+    .edit-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px dashed #30D158;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    a.link {
+      color: #B0B0B0;
+      text-decoration: underline;
+      font-size: 12px;
+      font-family: Inter, sans-serif;
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+  <button class="edit-btn" onclick="requestEdit()">Enter Edit Code</button>
+  <audio id="crowSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_a87868e318.mp3"></audio>
+  <div id="mainContent" class="fade-in">
+    <div style="width: 1920px; height: 1080px; position: relative">
+      <img style="width: 1920px; height: 1080px; left: 0px; top: 0px; position: absolute" src="https://t3.ftcdn.net/jpg/08/40/89/84/360_F_840898433_o7OSaS3IQb20mZfgM5jyn9ExvJB6Nr9p.jpg" />
+      <div style="width: 886px; height: 893px; left: 517px; top: 93px; position: absolute; border-radius: 16px; outline: 1px black solid"></div>
+      <div style="width: 886px; height: 857px; left: 517px; top: 126px; position: absolute; background: #1E1E1E; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px"></div>
+      <div style="width: 886px; height: 36px; left: 517px; top: 93px; position: absolute; background: rgba(50, 50, 50, 0.88); border-top-left-radius: 16px; border-top-right-radius: 16px; backdrop-filter: blur(22.50px)"></div>
+      <div style="width: 886px; height: 893px; left: 517px; top: 93px; position: absolute; border-radius: 16px; border: 1px #686868 solid"></div>
+      <div style="width: 46px; height: 10px; left: 532px; top: 106px; position: absolute; justify-content: flex-start; align-items: flex-start; gap: 8px; display: inline-flex">
+        <div style="width: 10px; height: 10px; background: #FF453A; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
+        <div style="width: 10px; height: 10px; background: #FFD60A; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
+        <div style="width: 10px; height: 10px; background: #30D158; box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.05) inset; border-radius: 9999px"></div>
+      </div>
+      <div style="width: 256px; height: 28px; left: 832px; top: 97px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.85); font-size: 15px; font-family: SF Pro; font-weight: 274; line-height: 22px; word-wrap: break-word">~ : bash — After0Maf</div>
+      <div style="width: 208px; height: 219px; left: 532px; top: 146px; position: absolute; backgaround: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
+      <div style="width: 640px; height: 56px; left: 747px; top: 146px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
+      <div style="width: 627px; height: 25px; left: 760px; top: 161px; position: absolute; justify-content: center; display: flex; flex-direction: column; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 7px; word-wrap: break-word">Name: After0Maf | Pronouns: He/Him | Age: 13</div>
+      <div style="width: 640px; height: 91px; left: 747px; top: 209px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
+      <div style="width: 627px; height: 58px; left: 760px; top: 223px; position: absolute; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word">Description:<br/>“the 0 in my name is silent<br/>its just there to look cool”</div>
+      <div style="width: 627px; height: 58px; left: 1217px; top: 791px; position: absolute; color: white; font-size: 12px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word">developed by zyphonz</div>
+      <div style="width: 147px; height: 184px; left: 563px; top: 163px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.81); font-size: 4px; font-family: Kelly Slab; font-weight: 400; line-height: 7px; word-wrap: break-word">               ████████               <br/>           ████▓▓▓▓▓▓▓▓████           <br/>        ███▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███        <br/>       █▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>     █▓▓▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█     <br/>     █▓▓▓▒▒███▒▒▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>     █▓▓▓▓▓███▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>       █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>        ███▓▓▓▓▓██████▓▓▓▓▓███        <br/>           ████▓▓▓▓▓▓▓▓████           <br/>               ████████               <br/>                                      <br/>            ██████████████            <br/>        █████   ▄════▄   █████        <br/>     ███▓▓▓▓█   ▌████▐   █▓▓▓▓███     <br/>   ██▓▓▓▓▓▓▓█   ▌████▐   █▓▓▓▓▓▓▓██   <br/>  █▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓█  <br/> █▓▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓▓█ <br/> █▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐██▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓█ <br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓█  ▌▐▌▐  █▓▓▓▓▓▓▓▓▓▓▓▓▓█<br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓▓▓█</div>
+      <img style="width: 291px; height: 227px; left: 1112px; top: 759px; position: absolute" src="https://placehold.co/291x227" />
+      <div style="width: 640px; height: 58px; left: 747px; top: 307px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
+      <a href="https://www.roblox.com/users/5677297724/profile" class="link" style="left: 760px; top: 316px;">https://www.roblox.com/users/5677297724/profile</a>
+      <a href="https://www.youtube.com/@After0Maf" class="link" style="left: 760px; top: 337px;">https://www.youtube.com/@After0Maf</a>
+      <img id="crowImg" onclick="document.getElementById('crowSound').play()" style="width: 291px; height: 227px; left: 1112px; top: 759px; position: absolute; cursor: pointer;" src="https://cdn.discordapp.com/attachments/1340194765299519498/1384990664697184357/image.png?ex=68547092&is=68531f12&hm=1917198f8f1ba7356902cd6e4a827c0d142915ebedde822221fa363ba7b3872e&" />
+      <div style="width: 855px; height: 387px; left: 532px; top: 372px; position: absolute; overflow: hidden">
+        <div style="width: 855px; height: 387px; left: 0px; top: 0px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
+      </div>
+  </div>
+  <script>
+    const correctCode = "letmein";
+    function requestEdit() {
+      const code = prompt("Enter code to enable editing:");
+      if (code === correctCode) {
+        alert("Editing enabled. You can now click and edit content.");
+        document.querySelectorAll('#mainContent div, #mainContent span').forEach(el => {
+          el.setAttribute("contenteditable", "true");
+        });
+      } else {
+        alert("Incorrect code.");
+      }
+    }
+  </script>
+</body>
+</html>
