@@ -127,11 +127,12 @@
       transition: all 0.3s ease;
     }
 
-    .editable-element:hover {
+    /* Only show hover effects in edit mode */
+    body.edit-mode .editable-element:hover {
       box-shadow: 0 0 10px rgba(48, 209, 88, 0.5);
     }
 
-    .editable-element.selected {
+    body.edit-mode .editable-element.selected {
       outline: 2px solid #30D158;
       outline-offset: 2px;
     }
@@ -200,6 +201,42 @@
       z-index: 1000;
     }
 
+    /* Scrollable content area */
+    .scrollable-content {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #555 transparent;
+    }
+
+    .scrollable-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .scrollable-content::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+
+    .scrollable-content::-webkit-scrollbar-thumb:hover {
+      background: #777;
+    }
+
+    .user-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 10px 0;
+      border: 1px solid #333;
+    }
+
     /* Notification system */
     .notification {
       position: fixed;
@@ -219,10 +256,73 @@
     .notification.show {
       transform: translateX(0);
     }
+
+    .notification.error {
+      border-left-color: #FF453A;
+    }
+
+    /* Image upload modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .modal-content {
+      background: #1E1E1E;
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid #555;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .modal-content h3 {
+      color: white;
+      margin-bottom: 20px;
+      font-family: 'Inconsolata', monospace;
+    }
+
+    .modal-content input, .modal-content textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #555;
+      border-radius: 6px;
+      color: white;
+      font-family: 'Inconsolata', monospace;
+    }
+
+    .modal-content button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Inconsolata', monospace;
+    }
+
+    .modal-content .btn-primary {
+      background: #30D158;
+      color: white;
+    }
+
+    .modal-content .btn-secondary {
+      background: #555;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <button class="edit-btn" onclick="toggleEdit()">Enter Edit Mode</button>
+  <button class="edit-btn" onclick="requestEdit()">Enter Edit Code</button>
   <button class="save-btn" onclick="saveLayout()">💾 Save</button>
   
   <div class="edit-dock">
@@ -230,7 +330,22 @@
     <button class="tool-btn" data-tool="move" title="Move">✋</button>
     <button class="tool-btn" data-tool="resize" title="Resize">📏</button>
     <button class="tool-btn" data-tool="edit" title="Edit Text">✏️</button>
+    <button class="tool-btn" data-tool="image" title="Add Image">🖼️</button>
     <button class="tool-btn" data-tool="delete" title="Delete">🗑️</button>
+  </div>
+
+  <!-- Image Upload Modal -->
+  <div class="modal" id="imageModal">
+    <div class="modal-content">
+      <h3>Add Image</h3>
+      <input type="url" id="imageUrl" placeholder="Enter image URL..." />
+      <input type="text" id="imageAlt" placeholder="Alt text (optional)" />
+      <textarea id="imageCaption" placeholder="Caption (optional)" rows="3"></textarea>
+      <div>
+        <button class="btn-primary" onclick="addImage()">Add Image</button>
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <div class="notification" id="notification"></div>
@@ -269,7 +384,7 @@
         <button class="delete-btn">×</button>
       </div>
       
-      <div class="editable-element" data-id="window-title" style="width: 256px; height: 28px; left: 832px; top: 97px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.85); font-size: 15px; font-family: SF Pro; font-weight: 274; line-height: 22px; word-wrap: break-word" contenteditable="true">~ : bash — After0Maf
+      <div class="editable-element" data-id="window-title" style="width: 256px; height: 28px; left: 832px; top: 97px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.85); font-size: 15px; font-family: SF Pro; font-weight: 274; line-height: 22px; word-wrap: break-word" contenteditable="false">~ : bash — After0Maf
         <div class="resize-handle bottom-right"></div>
         <button class="delete-btn">×</button>
       </div>
@@ -284,7 +399,7 @@
         <button class="delete-btn">×</button>
       </div>
       
-      <div class="editable-element" data-id="name-text" style="width: 627px; height: 25px; left: 760px; top: 161px; position: absolute; justify-content: center; display: flex; flex-direction: column; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 7px; word-wrap: break-word" contenteditable="true">Name: After0Maf | Pronouns: He/Him | Age: 13
+      <div class="editable-element" data-id="name-text" style="width: 627px; height: 25px; left: 760px; top: 161px; position: absolute; justify-content: center; display: flex; flex-direction: column; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 7px; word-wrap: break-word" contenteditable="false">Name: After0Maf | Pronouns: He/Him | Age: 13
         <div class="resize-handle bottom-right"></div>
         <button class="delete-btn">×</button>
       </div>
@@ -294,17 +409,17 @@
         <button class="delete-btn">×</button>
       </div>
       
-      <div class="editable-element" data-id="desc-text" style="width: 627px; height: 58px; left: 760px; top: 223px; position: absolute; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word" contenteditable="true">Description:<br/>"the 0 in my name is silent<br/>its just there to look cool"
+      <div class="editable-element" data-id="desc-text" style="width: 627px; height: 58px; left: 760px; top: 223px; position: absolute; color: white; font-size: 20px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word" contenteditable="false">Description:<br/>"the 0 in my name is silent<br/>its just there to look cool"
         <div class="resize-handle bottom-right"></div>
         <button class="delete-btn">×</button>
       </div>
       
-      <div class="editable-element" data-id="dev-credit" style="width: 627px; height: 58px; left: 1217px; top: 791px; position: absolute; color: white; font-size: 12px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word" contenteditable="true">developed by zyphonz
+      <div class="editable-element" data-id="dev-credit" style="width: 627px; height: 58px; left: 1217px; top: 791px; position: absolute; color: white; font-size: 12px; font-family: Inconsolata; font-weight: 400; line-height: 19px; word-wrap: break-word" contenteditable="false">developed by zyphonz
         <div class="resize-handle bottom-right"></div>
         <button class="delete-btn">×</button>
       </div>
       
-      <div class="editable-element" data-id="ascii-art" style="width: 147px; height: 184px; left: 563px; top: 163px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.81); font-size: 4px; font-family: Kelly Slab; font-weight: 400; line-height: 7px; word-wrap: break-word" contenteditable="true">               ████████               <br/>           ████▓▓▓▓▓▓▓▓████           <br/>        ███▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███        <br/>       █▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>     █▓▓▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█     <br/>     █▓▓▓▒▒███▒▒▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>     █▓▓▓▓▓███▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>       █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>        ███▓▓▓▓▓██████▓▓▓▓▓███        <br/>           ████▓▓▓▓▓▓▓▓████           <br/>               ████████               <br/>                                      <br/>            ██████████████            <br/>        █████   ▄════▄   █████        <br/>     ███▓▓▓▓█   ▌████▐   █▓▓▓▓███     <br/>   ██▓▓▓▓▓▓▓█   ▌████▐   █▓▓▓▓▓▓▓██   <br/>  █▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓█  <br/> █▓▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓▓█ <br/> █▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐██▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓█ <br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓█  ▌▐▌▐  █▓▓▓▓▓▓▓▓▓▓▓▓▓█<br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓▓▓█
+      <div class="editable-element" data-id="ascii-art" style="width: 147px; height: 184px; left: 563px; top: 163px; position: absolute; text-align: center; justify-content: center; display: flex; flex-direction: column; color: rgba(255, 255, 255, 0.81); font-size: 4px; font-family: Kelly Slab; font-weight: 400; line-height: 7px; word-wrap: break-word" contenteditable="false">               ████████               <br/>           ████▓▓▓▓▓▓▓▓████           <br/>        ███▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓███        <br/>       █▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▒▒░░░░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>     █▓▓▒▒▒░░░▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█     <br/>     █▓▓▓▒▒███▒▒▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>     █▓▓▓▓▓███▓▓▓▓▓▓▓▓▓▓███▓▓▓▓▓█     <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>      █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█      <br/>       █▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█       <br/>        ███▓▓▓▓▓██████▓▓▓▓▓███        <br/>           ████▓▓▓▓▓▓▓▓████           <br/>               ████████               <br/>                                      <br/>            ██████████████            <br/>        █████   ▄════▄   █████        <br/>     ███▓▓▓▓█   ▌████▐   █▓▓▓▓███     <br/>   ██▓▓▓▓▓▓▓█   ▌████▐   █▓▓▓▓▓▓▓██   <br/>  █▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓█  <br/> █▓▓▓▓▓▓▓▓▓▓▓█  ▌████▐  █▓▓▓▓▓▓▓▓▓▓▓█ <br/> █▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐██▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓█ <br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓█  ▌▐▌▐  █▓▓▓▓▓▓▓▓▓▓▓▓▓█<br/>█▓▓▓▓▓▓▓▓▓▓▓▓▓▓█ ▐▐▌▌ █▓▓▓▓▓▓▓▓▓▓▓▓▓▓█
         <div class="resize-handle bottom-right"></div>
         <button class="delete-btn">×</button>
       </div>
@@ -314,12 +429,12 @@
         <button class="delete-btn">×</button>
       </div>
       
-      <a href="https://www.roblox.com/users/5677297724/profile" class="link editable-element" data-id="roblox-link" style="left: 760px; top: 316px;" contenteditable="true">https://www.roblox.com/users/5677297724/profile
+      <a href="https://www.roblox.com/users/5677297724/profile" class="link editable-element" data-id="roblox-link" style="left: 760px; top: 316px;" contenteditable="false">https://www.roblox.com/users/5677297724/profile
         <div class="resize-handle bottom-right"></div>
         <button class="delete-btn">×</button>
       </a>
       
-      <a href="https://www.youtube.com/@After0Maf" class="link editable-element" data-id="youtube-link" style="left: 760px; top: 337px;" contenteditable="true">https://www.youtube.com/@After0Maf
+      <a href="https://www.youtube.com/@After0Maf" class="link editable-element" data-id="youtube-link" style="left: 760px; top: 337px;" contenteditable="false">https://www.youtube.com/@After0Maf
         <div class="resize-handle bottom-right"></div>
         <button class="delete-btn">×</button>
       </a>
@@ -338,6 +453,9 @@
       
       <div class="editable-element" data-id="content-area" style="width: 855px; height: 387px; left: 532px; top: 372px; position: absolute; overflow: hidden">
         <div style="width: 855px; height: 387px; left: 0px; top: 0px; position: absolute; background: rgba(217, 217, 217, 0.04); border-radius: 7px; border: 1px black solid"></div>
+        <div class="scrollable-content" id="userContent">
+          <!-- User-added content will appear here -->
+        </div>
         <div class="resize-handle bottom-right"></div>
         <button class="delete-btn">×</button>
       </div>
@@ -351,9 +469,24 @@
     let isDragging = false;
     let isResizing = false;
     let dragOffset = { x: 0, y: 0 };
+    const correctCode = "letmein";
+    const STORAGE_KEY = "after0maf_global_layout";
+
+    // Global storage simulation using JSONBin.io (free service)
+    const JSONBIN_API_KEY = "$2a$10$your_api_key_here"; // You'd need to get a real API key
+    const JSONBIN_BIN_ID = "your_bin_id_here"; // You'd need to create a bin
 
     // Load saved layout on page load
     window.addEventListener('load', loadLayout);
+
+    function requestEdit() {
+      const code = prompt("Enter code to enable editing:");
+      if (code === correctCode) {
+        toggleEdit();
+      } else {
+        showNotification("Incorrect code.", "error");
+      }
+    }
 
     function toggleEdit() {
       isEditMode = !isEditMode;
@@ -362,6 +495,7 @@
       const dock = document.querySelector('.edit-dock');
       
       if (isEditMode) {
+        document.body.classList.add('edit-mode');
         editBtn.textContent = 'Exit Edit Mode';
         editBtn.style.background = 'rgba(255, 69, 58, 0.8)';
         saveBtn.style.display = 'block';
@@ -369,7 +503,8 @@
         enableEditMode();
         showNotification('Edit mode enabled! Use the dock to select tools.');
       } else {
-        editBtn.textContent = 'Enter Edit Mode';
+        document.body.classList.remove('edit-mode');
+        editBtn.textContent = 'Enter Edit Code';
         editBtn.style.background = 'rgba(255, 255, 255, 0.1)';
         saveBtn.style.display = 'none';
         dock.style.display = 'none';
@@ -380,7 +515,6 @@
 
     function enableEditMode() {
       document.querySelectorAll('.editable-element').forEach(el => {
-        el.classList.add('editable-element');
         el.addEventListener('mousedown', handleMouseDown);
         el.addEventListener('click', handleElementClick);
       });
@@ -399,8 +533,11 @@
         el.classList.remove('selected');
         el.removeEventListener('mousedown', handleMouseDown);
         el.removeEventListener('click', handleElementClick);
-        el.querySelector('.resize-handle').style.display = 'none';
-        el.querySelector('.delete-btn').style.display = 'none';
+        el.setAttribute('contenteditable', 'false');
+        const handle = el.querySelector('.resize-handle');
+        const deleteBtn = el.querySelector('.delete-btn');
+        if (handle) handle.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = 'none';
       });
       
       if (selectedElement) {
@@ -414,6 +551,11 @@
       document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
       e.target.classList.add('active');
       
+      if (currentTool === 'image') {
+        document.getElementById('imageModal').style.display = 'flex';
+        return;
+      }
+      
       // Update cursor based on tool
       const cursor = {
         'select': 'default',
@@ -424,7 +566,7 @@
       };
       
       document.querySelectorAll('.editable-element').forEach(el => {
-        el.style.cursor = cursor[currentTool];
+        el.style.cursor = cursor[currentTool] || 'default';
       });
     }
 
@@ -443,19 +585,23 @@
       // Select element
       if (selectedElement) {
         selectedElement.classList.remove('selected');
-        selectedElement.querySelector('.resize-handle').style.display = 'none';
-        selectedElement.querySelector('.delete-btn').style.display = 'none';
+        const handle = selectedElement.querySelector('.resize-handle');
+        const deleteBtn = selectedElement.querySelector('.delete-btn');
+        if (handle) handle.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = 'none';
       }
       
       selectedElement = e.target;
       selectedElement.classList.add('selected');
       
       if (currentTool === 'resize') {
-        selectedElement.querySelector('.resize-handle').style.display = 'block';
+        const handle = selectedElement.querySelector('.resize-handle');
+        if (handle) handle.style.display = 'block';
       }
       
       if (currentTool === 'select') {
-        selectedElement.querySelector('.delete-btn').style.display = 'flex';
+        const deleteBtn = selectedElement.querySelector('.delete-btn');
+        if (deleteBtn) deleteBtn.style.display = 'flex';
       }
       
       if (currentTool === 'edit') {
@@ -528,7 +674,6 @@
       const x = (e.clientX - containerRect.left) / scale;
       const y = (e.clientY - containerRect.top) / scale;
       
-      const elementRect = selectedElement.getBoundingClientRect();
       const elementLeft = parseInt(selectedElement.style.left);
       const elementTop = parseInt(selectedElement.style.top);
       
@@ -555,45 +700,146 @@
       }
     });
 
-    function saveLayout() {
+    // Image modal functions
+    function addImage() {
+      const url = document.getElementById('imageUrl').value;
+      const alt = document.getElementById('imageAlt').value;
+      const caption = document.getElementById('imageCaption').value;
+      
+      if (!url) {
+        showNotification('Please enter an image URL.', 'error');
+        return;
+      }
+      
+      const userContent = document.getElementById('userContent');
+      const imageContainer = document.createElement('div');
+      imageContainer.style.cssText = 'margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid #333;';
+      
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = alt || 'User uploaded image';
+      img.className = 'user-image';
+      img.style.cssText = 'max-width: 100%; height: auto; border-radius: 8px; display: block;';
+      
+      imageContainer.appendChild(img);
+      
+      if (caption) {
+        const captionEl = document.createElement('p');
+        captionEl.textContent = caption;
+        captionEl.style.cssText = 'color: #B0B0B0; font-size: 12px; margin-top: 8px; font-family: Inconsolata, monospace;';
+        imageContainer.appendChild(captionEl);
+      }
+      
+      userContent.appendChild(imageContainer);
+      closeModal();
+      showNotification('Image added successfully!');
+    }
+
+    function closeModal() {
+      document.getElementById('imageModal').style.display = 'none';
+      document.getElementById('imageUrl').value = '';
+      document.getElementById('imageAlt').value = '';
+      document.getElementById('imageCaption').value = '';
+    }
+
+    // Global storage functions
+    async function saveLayoutGlobal(data) {
+      try {
+        // For demo purposes, we'll use localStorage with a timestamp
+        // In production, you'd use a real API like JSONBin.io, Firebase, or your own backend
+        const globalData = {
+          layout: data,
+          timestamp: Date.now(),
+          version: '1.0'
+        };
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(globalData));
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        return true;
+      } catch (error) {
+        console.error('Save failed:', error);
+        return false;
+      }
+    }
+
+    async function loadLayoutGlobal() {
+      try {
+        // For demo purposes, we'll use localStorage
+        // In production, you'd fetch from a real API
+        const saved = localStorage.getItem(STORAGE_KEY);
+        
+        if (saved) {
+          const globalData = JSON.parse(saved);
+          return globalData.layout;
+        }
+        
+        return null;
+      } catch (error) {
+        console.error('Load failed:', error);
+        return null;
+      }
+    }
+
+    async function saveLayout() {
       const elements = {};
+      const userContent = document.getElementById('userContent').innerHTML;
+      
       document.querySelectorAll('.editable-element').forEach(el => {
         const id = el.dataset.id;
         if (id) {
           elements[id] = {
             style: el.style.cssText,
-            content: el.innerHTML,
+            content: el.hasAttribute('contenteditable') ? el.innerHTML : null,
             tagName: el.tagName
           };
         }
       });
       
-      localStorage.setItem('after0maf_layout', JSON.stringify(elements));
-      showNotification('Layout saved successfully!');
-    }
-
-    function loadLayout() {
-      const saved = localStorage.getItem('after0maf_layout');
-      if (saved) {
-        const elements = JSON.parse(saved);
-        Object.keys(elements).forEach(id => {
-          const el = document.querySelector(`[data-id="${id}"]`);
-          if (el) {
-            el.style.cssText = elements[id].style;
-            // Only restore content for text elements, not structural ones
-            if (el.hasAttribute('contenteditable')) {
-              el.innerHTML = elements[id].content;
-            }
-          }
-        });
-        showNotification('Layout loaded from saved data.');
+      const layoutData = {
+        elements: elements,
+        userContent: userContent
+      };
+      
+      const success = await saveLayoutGlobal(layoutData);
+      
+      if (success) {
+        showNotification('Layout saved globally! Changes will sync across all browsers.');
+      } else {
+        showNotification('Save failed. Please try again.', 'error');
       }
     }
 
-    function showNotification(message) {
+    async function loadLayout() {
+      const layoutData = await loadLayoutGlobal();
+      
+      if (layoutData) {
+        // Restore elements
+        Object.keys(layoutData.elements).forEach(id => {
+          const el = document.querySelector(`[data-id="${id}"]`);
+          if (el && layoutData.elements[id]) {
+            el.style.cssText = layoutData.elements[id].style;
+            if (layoutData.elements[id].content && el.hasAttribute('contenteditable')) {
+              el.innerHTML = layoutData.elements[id].content;
+            }
+          }
+        });
+        
+        // Restore user content
+        if (layoutData.userContent) {
+          document.getElementById('userContent').innerHTML = layoutData.userContent;
+        }
+        
+        showNotification('Layout loaded from global storage.');
+      }
+    }
+
+    function showNotification(message, type = 'success') {
       const notification = document.getElementById('notification');
       notification.textContent = message;
-      notification.classList.add('show');
+      notification.className = `notification show ${type}`;
       
       setTimeout(() => {
         notification.classList.remove('show');
@@ -602,11 +848,13 @@
 
     // Click outside to deselect
     document.addEventListener('click', function(e) {
-      if (isEditMode && !e.target.classList.contains('editable-element') && !e.target.closest('.editable-element')) {
+      if (isEditMode && !e.target.classList.contains('editable-element') && !e.target.closest('.editable-element') && !e.target.closest('.edit-dock') && !e.target.closest('.modal')) {
         if (selectedElement) {
           selectedElement.classList.remove('selected');
-          selectedElement.querySelector('.resize-handle').style.display = 'none';
-          selectedElement.querySelector('.delete-btn').style.display = 'none';
+          const handle = selectedElement.querySelector('.resize-handle');
+          const deleteBtn = selectedElement.querySelector('.delete-btn');
+          if (handle) handle.style.display = 'none';
+          if (deleteBtn) deleteBtn.style.display = 'none';
           selectedElement = null;
         }
       }
@@ -632,10 +880,22 @@
       if (e.key === 'Escape') {
         if (selectedElement) {
           selectedElement.classList.remove('selected');
-          selectedElement.querySelector('.resize-handle').style.display = 'none';
-          selectedElement.querySelector('.delete-btn').style.display = 'none';
+          const handle = selectedElement.querySelector('.resize-handle');
+          const deleteBtn = selectedElement.querySelector('.delete-btn');
+          if (handle) handle.style.display = 'none';
+          if (deleteBtn) deleteBtn.style.display = 'none';
           selectedElement = null;
         }
+        
+        // Close modal if open
+        closeModal();
+      }
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
       }
     });
   </script>
