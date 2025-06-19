@@ -740,25 +740,28 @@
       document.getElementById('imageCaption').value = '';
     }
 
-    // Global storage functions
     async function saveLayoutGlobal(data) {
       try {
-        // For demo purposes, we'll use localStorage with a timestamp
-        // In production, you'd use a real API like JSONBin.io, Firebase, or your own backend
-        const globalData = {
-          layout: data,
-          timestamp: Date.now(),
-          version: '1.0'
-        };
-        
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(globalData));
-        
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": JSONBIN_API_KEY
+          },
+          body: JSON.stringify({
+            record: {
+              layout: data,
+              timestamp: Date.now(),
+              version: '1.0'
+            }
+          })
+        });
+    
+        if (!response.ok) throw new Error('Failed to save layout');
+    
         return true;
-      } catch (error) {
-        console.error('Save failed:', error);
+      } catch (err) {
+        console.error('Save failed:', err);
         return false;
       }
     }
