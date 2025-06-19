@@ -768,18 +768,18 @@
 
     async function loadLayoutGlobal() {
       try {
-        // For demo purposes, we'll use localStorage
-        // In production, you'd fetch from a real API
-        const saved = localStorage.getItem(STORAGE_KEY);
-        
-        if (saved) {
-          const globalData = JSON.parse(saved);
-          return globalData.layout;
-        }
-        
-        return null;
-      } catch (error) {
-        console.error('Load failed:', error);
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+          headers: {
+            "X-Master-Key": JSONBIN_API_KEY
+          }
+        });
+    
+        if (!response.ok) throw new Error('Failed to load layout');
+    
+        const json = await response.json();
+        return json.record.layout;
+      } catch (err) {
+        console.error('Load failed:', err);
         return null;
       }
     }
