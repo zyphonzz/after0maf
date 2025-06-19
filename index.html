@@ -323,7 +323,7 @@
 </head>
 <body>
   <button class="edit-btn" onclick="requestEdit()">Enter Edit Code</button>
-  <button class="save-btn" onclick="saveLayoutGlobal()">💾 Save</button>
+  <button class="save-btn" onclick="saveLayout()">💾 Save</button>
   
   <div class="edit-dock">
     <button class="tool-btn" data-tool="select" title="Select">🔍</button>
@@ -475,7 +475,7 @@
     const JSONBIN_BIN_ID = "685328628561e97a5026cba9"; // You'd need to create a bin
 
     // Load saved layout on page load
-    window.addEventListener('load', loadLayoutGlobal);
+    window.addEventListener('load', loadLayout);
 
     function requestEdit() {
       const code = prompt("Enter code to enable editing:");
@@ -791,7 +791,7 @@
       }
     }
 
-    async function loadLayoutGlobal() {
+    async function loadLayout() {
       const binId = JSONBIN_BIN_ID;
       const apiKey = JSONBIN_API_KEY;
     
